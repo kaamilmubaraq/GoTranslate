@@ -457,6 +457,14 @@ body {
 .pos-副詞  { background: #ffedd5; color: #c2410c; }
 .pos-other { background: #f3f4f6; color: #4b5563; }
 
+.card-badges {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .card-jlpt {
   display: inline-block;
   font-size: 0.68rem;
