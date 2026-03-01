@@ -16,6 +16,7 @@ Usage:
 
 from __future__ import annotations
 
+import csv
 import os
 import re
 import unicodedata
@@ -61,7 +62,7 @@ _WS_RE = re.compile(r"\s+")             # compiled once at import time
 
 _TAGGER: Optional[fugashi.Tagger] = None
 _JMD: Optional[Jamdict] = None
-_MEANINGS_CACHE: Dict[str, List[str]] = {}   # lemma:max_senses → meanings
+_ENTRY_CACHE: Dict[str, Tuple[List[str], int]] = {}  # lemma:max_senses → (meanings, freq_score)
 
 
 # =========================
@@ -237,17 +238,103 @@ def gloss_to_text(gloss_obj) -> str:
     return txt if isinstance(txt, str) and txt else str(gloss_obj)
 
 
-def lookup_english_meanings(jmd: Jamdict, query: str, max_senses: int = 2) -> List[str]:
+# =========================
+# JLPT word list (Jonathan Waller / elzup)
+# libraries/data/jlpt/all.csv  columns: expression,reading,meaning,tags
+# tags contains e.g. "JLPT_1 JLPT" → N1
+# =========================
+
+_JLPT_EXPR: Dict[str, str] = {}   # expression (kanji/kana) → "N1"…"N5"
+_JLPT_READ: Dict[str, str] = {}   # reading (hiragana) → level, fallback only
+_JLPT_LOADED: bool = False
+_JLPT_TAG_RE = re.compile(r"JLPT_(\d)")
+_LEVEL_RANK: Dict[str, int] = {"N5": 5, "N4": 4, "N3": 3, "N2": 2, "N1": 1}
+
+
+def _load_jlpt_index() -> None:
+    global _JLPT_LOADED
+    _JLPT_LOADED = True
+    csv_path = os.path.join(_module_dir(), "data", "jlpt", "all.csv")
+    if not os.path.exists(csv_path):
+        return
+    with open(csv_path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            m = _JLPT_TAG_RE.search(row.get("tags", ""))
+            if not m:
+                continue
+            level = f"N{m.group(1)}"
+            expr = (row.get("expression") or "").strip()
+            reading = (row.get("reading") or "").strip()
+            if expr:
+                # keep easiest (highest rank) level when expression appears multiple times
+                if _LEVEL_RANK.get(level, 0) > _LEVEL_RANK.get(_JLPT_EXPR.get(expr, ""), 0):
+                    _JLPT_EXPR[expr] = level
+            if reading:
+                if _LEVEL_RANK.get(level, 0) > _LEVEL_RANK.get(_JLPT_READ.get(reading, ""), 0):
+                    _JLPT_READ[reading] = level
+
+
+def _get_jlpt_level(word: str, reading: str = "") -> Optional[str]:
     """
-    Lookup English meanings for a lemma.
-    Results are cached in _MEANINGS_CACHE so repeated lookups hit memory, not the DB.
-    Returns up to max_senses strings (each may be multiple glosses joined by '; ').
+    Look up JLPT level from the bundled Jonathan Waller word list.
+    Returns None for words not in the list (no badge shown in UI).
+    """
+    if not _JLPT_LOADED:
+        _load_jlpt_index()
+    return _JLPT_EXPR.get(word) or (_JLPT_READ.get(reading) if reading else None)
+
+
+def _entry_freq_score(entry) -> int:
+    """
+    Convert JMdict priority tags into a difficulty score.
+    Higher score = rarer/harder word = displayed first.
+
+    Tag mapping:
+      nfXX  → score = XX  (nf01=1 most common, nf48=48 rarest tagged)
+      ichi1/news1/spec1/gai1 → 5  (common word, no nf rank)
+      ichi2/news2/spec2/gai2 → 25 (slightly less common)
+      (no tags)              → 999 (rare/unknown → hardest)
+    """
+    pri_tags: List[str] = []
+    for kf in (entry.kanji_forms or []):
+        pri_tags.extend(getattr(kf, "pri", None) or [])
+    for rf in (entry.kana_forms or []):
+        pri_tags.extend(getattr(rf, "pri", None) or [])
+
+    if not pri_tags:
+        return 999
+
+    nf_scores = []
+    for tag in pri_tags:
+        if tag.startswith("nf"):
+            try:
+                nf_scores.append(int(tag[2:]))
+            except ValueError:
+                pass
+
+    if nf_scores:
+        return min(nf_scores)  # best (lowest) nf rank wins
+
+    # Has common markers but no nfXX ranking
+    tier1 = {"ichi1", "news1", "spec1", "gai1"}
+    if any(t in tier1 for t in pri_tags):
+        return 5
+    return 25  # ichi2/news2/etc.
+
+
+def lookup_entry_data(jmd: Jamdict, query: str, max_senses: int = 2) -> Tuple[List[str], int]:
+    """
+    Lookup English meanings + difficulty score for a lemma in one DB call.
+    Cached in _ENTRY_CACHE so repeated lookups hit memory, not the DB.
+
+    Returns (meanings, freq_score) where higher freq_score = harder/rarer word.
     """
     cache_key = f"{query}\x00{max_senses}"
-    if cache_key in _MEANINGS_CACHE:
-        return _MEANINGS_CACHE[cache_key]
+    if cache_key in _ENTRY_CACHE:
+        return _ENTRY_CACHE[cache_key]
 
     meanings: List[str] = []
+    freq_score: int = 999
     try:
         lookup = jmd.lookup(query)
         if lookup.entries:
@@ -257,11 +344,12 @@ def lookup_english_meanings(jmd: Jamdict, query: str, max_senses: int = 2) -> Li
                 definition = "; ".join(glosses).strip()
                 if definition:
                     meanings.append(definition)
+            freq_score = _entry_freq_score(entry)
     except Exception:
-        pass  # safe fallback: cache and return empty
+        pass
 
-    _MEANINGS_CACHE[cache_key] = meanings
-    return meanings
+    _ENTRY_CACHE[cache_key] = (meanings, freq_score)
+    return meanings, freq_score
 
 
 # =========================
@@ -330,18 +418,24 @@ def analyze_text(
 
             reading = extract_reading_hiragana(w)
 
-            meanings = lookup_english_meanings(jmd, lemma, max_senses=max_senses)
+            meanings, freq_score = lookup_entry_data(jmd, lemma, max_senses=max_senses)
 
             results.append({
                 "word": lemma,
                 "reading": reading,
                 "pos": pos1,
                 "english": meanings,
+                "jlpt": _get_jlpt_level(lemma, reading),
+                "_freq_score": freq_score,
             })
 
     except Exception as e:
         print(f"Error analyzing text: {e}")
-        return results  # partial results are still useful
+
+    # Sort hardest (rarest) words first — higher freq_score = harder
+    results.sort(key=lambda x: x["_freq_score"], reverse=True)
+    for r in results:
+        del r["_freq_score"]
 
     return results
 

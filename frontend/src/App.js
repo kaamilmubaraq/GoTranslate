@@ -111,6 +111,9 @@ function VocabCard({ entry, index }) {
       <div className="card-word">{entry.word}</div>
       <div className="card-reading">{entry.reading}</div>
       <span className={posClass}>{posLabel}</span>
+      {entry.jlpt && (
+        <span className={`card-jlpt jlpt-${entry.jlpt}`}>{entry.jlpt}</span>
+      )}
       <hr className="card-divider" />
       {meanings.length > 0 ? (
         <ul className="card-meanings">

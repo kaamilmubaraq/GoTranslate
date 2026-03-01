@@ -457,6 +457,24 @@ body {
 .pos-副詞  { background: #ffedd5; color: #c2410c; }
 .pos-other { background: #f3f4f6; color: #4b5563; }
 
+.card-jlpt {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  margin-left: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  align-self: flex-start;
+}
+.jlpt-N5 { background: #dcfce7; color: #15803d; }
+.jlpt-N4 { background: #d1fae5; color: #065f46; }
+.jlpt-N3 { background: #fef9c3; color: #854d0e; }
+.jlpt-N2 { background: #ffedd5; color: #9a3412; }
+.jlpt-N1 { background: #fee2e2; color: #991b1b; }
+
 .card-divider {
   border: none;
   border-top: 1px solid #f3f4f6;
