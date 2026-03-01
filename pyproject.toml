@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["libraries"]
+markers = [
+    "slow: tests that load ML models — skip with: pytest -m 'not slow'",
+]

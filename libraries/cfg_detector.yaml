@@ -1,0 +1,4 @@
+post_process:
+  box_thresh: 0.62     # raise from 0.5 — drop low-confidence detections, fewer regions
+  min_size: 6          # raise from 2   — ignore tiny noise blobs / stray marks
+  max_candidates: 300  # lower from 1500 — a dense JP page rarely has more than 200 regions

@@ -1,0 +1,3 @@
+# PARSeq recognizer — no img_size override.
+# The pretrained weights fix positional embeddings to 400 positions (32×800 / 8×8 patches).
+# Changing img_size here would mismatch the checkpoint and crash model loading.

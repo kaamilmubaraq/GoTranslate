@@ -1,0 +1,530 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #fdfdf9;
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+  color: #1a1a2e;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+
+.header {
+  background: #1a1a2e;
+  padding: 18px 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-title {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.header-ja {
+  font-family: 'Noto Serif JP', serif;
+  color: #e05252;
+  font-size: 1.05rem;
+}
+
+.header-badge {
+  margin-left: auto;
+  background: rgba(224,82,82,0.18);
+  color: #f08080;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid rgba(224,82,82,0.3);
+}
+
+/* ── Main layout ─────────────────────────────────────── */
+
+.main {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Upload zone ─────────────────────────────────────── */
+
+.upload-zone {
+  position: relative;
+  border: 2px dashed #d1d5db;
+  border-radius: 20px;
+  padding: 64px 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.2s;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: #e05252;
+  background: #fff8f8;
+  box-shadow: 0 8px 40px rgba(224,82,82,0.1);
+  transform: translateY(-2px);
+}
+
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-icon {
+  font-size: 3.2rem;
+  display: block;
+  margin-bottom: 18px;
+}
+
+.upload-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.upload-sub {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.format-chips {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.format-chip {
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* ── File selected banner ────────────────────────────── */
+
+.file-banner {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 12px;
+}
+
+.file-banner-icon { font-size: 1.1rem; }
+
+.file-banner-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #166534;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-banner-clear {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.file-banner-clear:hover { color: #ef4444; }
+
+/* ── Error ───────────────────────────────────────────── */
+
+.error-box {
+  margin-top: 16px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* ── Engine toggle ───────────────────────────────────────── */
+
+.engine-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.engine-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #9ca3af;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.engine-label.active {
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.toggle-track {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: #d1d5db;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.22s;
+  flex-shrink: 0;
+}
+
+.toggle-track.on {
+  background: #c0392b;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+  transition: transform 0.22s;
+  display: block;
+}
+
+.toggle-track.on .toggle-thumb {
+  transform: translateX(20px);
+}
+
+.engine-note {
+  font-size: 0.75rem;
+  color: #c0392b;
+  font-style: italic;
+}
+
+/* ── Process button ──────────────────────────────────── */
+
+.process-btn {
+  display: block;
+  margin: 28px auto 0;
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  padding: 16px 52px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(192,57,43,0.3);
+  letter-spacing: 0.3px;
+}
+
+.process-btn:hover:not(:disabled) {
+  background: #a93226;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(192,57,43,0.38);
+}
+
+.process-btn:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Loading ─────────────────────────────────────────── */
+
+.loading-section {
+  text-align: center;
+  padding: 64px 0;
+}
+
+.spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #f3f4f6;
+  border-top-color: #c0392b;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text { font-size: 0.95rem; color: #6b7280; }
+
+.loading-ja {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.85rem;
+  color: #c0392b;
+  margin-top: 6px;
+}
+
+/* ── Results bar ─────────────────────────────────────── */
+
+.results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 48px 0 24px;
+  padding: 18px 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.results-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.results-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.results-count {
+  background: #c0392b;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 13px;
+  border-radius: 20px;
+}
+
+/* Download button — secondary action, clearly distinct from the red primary */
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1a2e;
+  color: #ffffff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+  box-shadow: 0 2px 10px rgba(26,26,46,0.18);
+  white-space: nowrap;
+}
+
+.download-btn:hover {
+  background: #2d2d50;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 18px rgba(26,26,46,0.25);
+}
+
+.download-btn:active {
+  transform: translateY(0);
+}
+
+.download-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.download-ext {
+  background: rgba(255,255,255,0.15);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .results-bar     { flex-direction: column; align-items: flex-start; }
+  .download-btn    { width: 100%; justify-content: center; }
+}
+
+/* ── Vocab grid ──────────────────────────────────────── */
+
+.vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* ── Vocab card ──────────────────────────────────────── */
+
+.vocab-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px 22px 24px;
+  border: 1px solid rgba(0,0,0,0.055);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05), 0 0 0 0 transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: fadeUp 0.35s ease both;
+  display: flex;
+  flex-direction: column;
+}
+
+.vocab-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.11);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card-word {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.card-reading {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: #c0392b;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+
+.card-pos {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  align-self: flex-start;
+}
+
+.pos-名詞  { background: #dbeafe; color: #1d4ed8; }
+.pos-動詞  { background: #dcfce7; color: #15803d; }
+.pos-形容詞 { background: #fae8ff; color: #7e22ce; }
+.pos-形状詞 { background: #fef9c3; color: #92400e; }
+.pos-副詞  { background: #ffedd5; color: #c2410c; }
+.pos-other { background: #f3f4f6; color: #4b5563; }
+
+.card-divider {
+  border: none;
+  border-top: 1px solid #f3f4f6;
+  margin: 0 0 14px;
+}
+
+.card-meanings {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+}
+
+.card-meaning {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.86rem;
+  color: #374151;
+  line-height: 1.45;
+}
+
+.meaning-num {
+  color: #c0392b;
+  font-weight: 700;
+  font-size: 0.78rem;
+  min-width: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.no-meaning {
+  font-size: 0.83rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ── Empty state ─────────────────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  padding: 64px 0;
+  color: #9ca3af;
+}
+
+.empty-icon {
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .main        { padding: 28px 16px 60px; }
+  .upload-zone { padding: 44px 20px; }
+  .header      { padding: 14px 18px; }
+  .header-title { font-size: 1.25rem; }
+
+  .vocab-grid  { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .vocab-card  { padding: 20px 16px 18px; }
+  .card-word   { font-size: 1.9rem; }
+  .card-reading { font-size: 0.8rem; }
+  .card-meaning { font-size: 0.82rem; }
+}
+
+@media (max-width: 400px) {
+  .vocab-grid { grid-template-columns: 1fr; }
+  .card-word  { font-size: 2.2rem; }
+}

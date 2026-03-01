@@ -1,0 +1,17 @@
+.git
+.gitignore
+README.md
+notes.txt
+package.json
+package-lock.json
+
+# Frontend — only the source is needed; the build is produced inside Docker
+frontend/node_modules
+frontend/build
+
+# Python caches and local data
+**/__pycache__
+**/*.pyc
+**/*.pyo
+libraries/jamdict.db
+libraries/test_output
