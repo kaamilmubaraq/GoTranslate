@@ -1,3 +1,42 @@
+# Deployment Workflow
+
+## Overview: Two remotes, one repo
+
+This project pushes to **two separate remotes** from the same local git repo:
+
+| Remote | Command | Purpose |
+|--------|---------|---------|
+| `origin` | `git push origin main` | GitHub — source code backup & history |
+| `hf` | `git push hf main` | HuggingFace Spaces — triggers live rebuild & deploy |
+
+**Typical workflow for every change:**
+```bash
+git add .
+git commit -m "describe what you changed"
+git push origin main   # save to GitHub
+git push hf main       # deploy to HuggingFace
+```
+
+To verify remotes are configured correctly:
+```bash
+git remote -v
+# Should show:
+# origin  https://github.com/YOUR_USER/GoTranslate.git (fetch/push)
+# hf      https://huggingface.co/spaces/codekmh/GoTranslate (fetch/push)
+```
+
+If `hf` remote is missing, add it:
+```bash
+git remote add hf https://huggingface.co/spaces/codekmh/GoTranslate
+```
+
+If `origin` remote is missing, add it:
+```bash
+git remote add origin https://github.com/YOUR_USER/GoTranslate.git
+```
+
+---
+
 # Deploying to HuggingFace Spaces
 
 Remote name: `hf`

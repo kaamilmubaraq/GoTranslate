@@ -432,8 +432,8 @@ def analyze_text(
     except Exception as e:
         print(f"Error analyzing text: {e}")
 
-    # Sort hardest (rarest) words first — higher freq_score = harder
-    results.sort(key=lambda x: x["_freq_score"], reverse=True)
+    # Sort: words with definitions first (hardest→easiest), then no-definition words at the end
+    results.sort(key=lambda x: (len(x["english"]) == 0, -x["_freq_score"]))
     for r in results:
         del r["_freq_score"]
 

@@ -42,6 +42,7 @@ COPY scripts/download_models.py /tmp/download_models.py
 RUN python3 /tmp/download_models.py && rm /tmp/download_models.py
 
 RUN useradd -m -u 1000 user
+RUN chown -R user:user /app/models
 
 # Copy library code and backend
 COPY libraries/ ./libraries/

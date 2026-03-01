@@ -50,5 +50,5 @@ print("[build] PaddleOCR models ready.")
 from huggingface_hub import snapshot_download
 
 snapshot_download("KotaroKinoshita/yomitoku-text-detector-dbnet-v2")
-snapshot_download("KotaroKinoshita/yomitoku-text-recognizer-parseq-open-beta")
+snapshot_download("KotaroKinoshita/yomitoku-text-recognizer-parseq-middle-v2")
 print("[build] yomitoku models ready.")
