@@ -51,6 +51,7 @@ _JP_CHAR_RE = re.compile(r"[一-龯々〆ヵヶぁ-んァ-ヶー]")
 
 # Matches tokens made entirely of katakana (loanwords — excluded from output)
 _PURE_KATAKANA_RE = re.compile(r"^[\u30A1-\u30FC\u30FD\u30FE]+$")
+_SINGLE_KANJI_RE = re.compile(r"^[\u4E00-\u9FFF\u3005\u3006]$")
 # OCR sometimes leaves standalone combining dakuten/handakuten
 _COMBINING_MARKS = {"\u3099", "\u309A"}  # ゙ ゚
 _WS_RE = re.compile(r"\s+")             # compiled once at import time
@@ -123,6 +124,11 @@ def normalize_ocr_text(text: str) -> str:
 def is_japanese_token(s: str) -> bool:
     """True if token contains kanji/kana characters."""
     return bool(_JP_CHAR_RE.search(s or ""))
+
+
+def is_single_kanji_token(s: str) -> bool:
+    """True if token is exactly one kanji character."""
+    return bool(_SINGLE_KANJI_RE.match(s or ""))
 
 
 # =========================
@@ -433,7 +439,13 @@ def analyze_text(
         print(f"Error analyzing text: {e}")
 
     # Sort: words with definitions first (hardest→easiest), then no-definition words at the end
-    results.sort(key=lambda x: (len(x["english"]) == 0, -x["_freq_score"]))
+    results.sort(
+        key=lambda x: (
+            len(x["english"]) == 0,
+            len(x["english"]) > 0 and is_single_kanji_token(x["word"]),
+            -x["_freq_score"],
+        )
+    )
     for r in results:
         del r["_freq_score"]
 

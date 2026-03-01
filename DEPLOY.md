@@ -85,7 +85,6 @@ git push hf main --force
 ### 2. Large files must go through Git LFS
 These are already configured in `.gitattributes`:
 - `*.jpg`, `*.png`, `*.pdf` — images and PDFs
-- `libraries/jamdict.db` — the dictionary database
 
 If you add a new large file (>10 MB), track it before adding:
 ```bash
