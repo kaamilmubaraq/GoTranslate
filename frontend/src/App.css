@@ -528,3 +528,45 @@ body {
   .vocab-grid { grid-template-columns: 1fr; }
   .card-word  { font-size: 2.2rem; }
 }
+
+/* ── Language selector ───────────────────────────────────────────────────── */
+.lang-select-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.lang-select-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.lang-select {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.lang-select:focus {
+  outline: none;
+  border-color: #c0392b;
+}
+
+.lang-warning {
+  font-size: 0.78rem;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 5px 12px;
+  margin-top: 8px;
+  text-align: center;
+}

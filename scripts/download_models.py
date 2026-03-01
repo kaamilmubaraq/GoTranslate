@@ -30,18 +30,19 @@ def dl(url, dest):
     print(f"[build] Extracted to {dest}")
 
 
-# PaddleOCR models
+# PaddleOCR models — destination read from PADDLE_OCR_DIR env var (set in Dockerfile)
+PADDLE_OCR_DIR = os.environ.get("PADDLE_OCR_DIR", "/app/models/paddleocr")
 dl(
     "https://paddleocr.bj.bcebos.com/PP-OCRv3/multilingual/Multilingual_PP-OCRv3_det_infer.tar",
-    "/root/.cache/paddleocr/det",
+    os.path.join(PADDLE_OCR_DIR, "det"),
 )
 dl(
     "https://paddleocr.bj.bcebos.com/PP-OCRv4/multilingual/japan_PP-OCRv4_rec_infer.tar",
-    "/root/.cache/paddleocr/rec",
+    os.path.join(PADDLE_OCR_DIR, "rec"),
 )
 dl(
     "https://paddleocr.bj.bcebos.com/dygraph_v2.0/ch/ch_ppocr_mobile_v2.0_cls_infer.tar",
-    "/root/.cache/paddleocr/cls",
+    os.path.join(PADDLE_OCR_DIR, "cls"),
 )
 print("[build] PaddleOCR models ready.")
 

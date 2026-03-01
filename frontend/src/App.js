@@ -7,6 +7,15 @@ import {
 import { saveAs } from 'file-saver';
 import './App.css';
 
+const LANGUAGES = [
+  { value: 'en',    label: 'English'   },
+  { value: 'zh-CN', label: 'Chinese'  },
+  { value: 'lo',    label: 'Lao'      },
+  { value: 'th',    label: 'Thai'     },
+  { value: 'mn',    label: 'Mongolian'},
+  { value: 'ko',    label: 'Korean'   },
+];
+
 const POS_LABELS = {
   '名詞': 'Noun',
   '動詞': 'Verb',
@@ -41,14 +50,14 @@ function makeCell(text, opts = {}) {
   });
 }
 
-async function downloadAsWord(vocabulary, filename) {
+async function downloadAsWord(vocabulary, filename, definitionLabel = 'English') {
   const headerRow = new TableRow({
     tableHeader: true,
     children: [
       makeHeaderCell('Word'),
       makeHeaderCell('Reading'),
       makeHeaderCell('Part of Speech'),
-      makeHeaderCell('English'),
+      makeHeaderCell(definitionLabel),
     ],
   });
 
@@ -128,6 +137,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [advanced, setAdvanced] = useState(false);
+  const [targetLang, setTargetLang] = useState('en');
+  const [definitionLabel, setDefinitionLabel] = useState('English');
 
   const applyFile = (f) => {
     setFile(f);
@@ -154,6 +165,7 @@ export default function App() {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('engine', advanced ? 'yomitoku' : 'paddleocr');
+    formData.append('target_lang', targetLang);
 
     setLoading(true);
     setError('');
@@ -165,6 +177,7 @@ export default function App() {
       const data = await res.json();
       if (res.ok) {
         setVocabulary(data.vocabulary);
+        setDefinitionLabel(LANGUAGES.find(l => l.value === targetLang)?.label ?? 'English');
       } else {
         setError(data.detail || 'Processing failed.');
       }
@@ -176,7 +189,7 @@ export default function App() {
   };
 
   const handleDownload = () => {
-    if (vocabulary && file) downloadAsWord(vocabulary, file.name);
+    if (vocabulary && file) downloadAsWord(vocabulary, file.name, definitionLabel);
   };
 
   return (
@@ -232,6 +245,24 @@ export default function App() {
             <span className="engine-note">First use loads a larger model (~30 s)</span>
           )}
         </div>
+
+        {/* Language selector */}
+        <div className="lang-select-row">
+          <label className="lang-select-label" htmlFor="lang-select">Definition language</label>
+          <select
+            id="lang-select"
+            className="lang-select"
+            value={targetLang}
+            onChange={e => setTargetLang(e.target.value)}
+          >
+            {LANGUAGES.map(l => (
+              <option key={l.value} value={l.value}>{l.label}</option>
+            ))}
+          </select>
+        </div>
+        {targetLang !== 'en' && (
+          <div className="lang-warning">⏱ Translation adds a few extra seconds to processing</div>
+        )}
 
         <button className="process-btn" onClick={handleProcess} disabled={!file || loading}>
           {loading ? 'Analyzing…' : 'Extract Vocabulary'}

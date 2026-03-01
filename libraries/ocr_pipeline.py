@@ -54,6 +54,7 @@ def process_bytes(
     pdf_dpi: int = 120,
     max_vocab_words: Optional[int] = None,
     db_path: Optional[str] = None,
+    target_lang: str = "en",
 ) -> Dict:
     """
     Run the full OCR + Japanese analysis pipeline on raw file bytes.
@@ -61,10 +62,11 @@ def process_bytes(
 
     Parameters
     ----------
-    data       : raw bytes of the file
-    suffix     : file extension including dot, e.g. ".jpg" or ".pdf"
-    engine     : "paddleocr" (normal/fast) or "yomitoku" (advanced/accurate)
-    pdf_dpi    : render resolution for PDF pages (120 is fast; 150 is sharper)
+    data        : raw bytes of the file
+    suffix      : file extension including dot, e.g. ".jpg" or ".pdf"
+    engine      : "paddleocr" (normal/fast) or "yomitoku" (advanced/accurate)
+    pdf_dpi     : render resolution for PDF pages (120 is fast; 150 is sharper)
+    target_lang : BCP-47 code for definition language ("en" = English, no translation)
     """
     suffix = suffix.lower()
     engine = engine.lower()
@@ -75,6 +77,9 @@ def process_bytes(
         if text_layer is not None:
             cleaned = normalize_ocr_ja(text_layer)
             vocabulary = analyze_text(cleaned, max_words=max_vocab_words, db_path=db_path)
+            if target_lang != "en":
+                from translator import translate_vocabulary
+                translate_vocabulary(vocabulary, target_lang)
             return {"vocabulary": vocabulary}
         # Slow path: scanned PDF — render pages and run OCR.
         image_source = pdf_bytes_to_images(data, dpi=pdf_dpi)
@@ -86,6 +91,7 @@ def process_bytes(
         _get_engine(engine),
         max_vocab_words=max_vocab_words,
         db_path=db_path,
+        target_lang=target_lang,
     )
 
 
@@ -95,6 +101,7 @@ def process_file(
     pdf_dpi: int = 120,
     max_vocab_words: Optional[int] = None,
     db_path: Optional[str] = None,
+    target_lang: str = "en",
 ) -> Dict:
     """
     Run the full OCR + Japanese analysis pipeline on an image or PDF file path.
@@ -117,6 +124,9 @@ def process_file(
         if text_layer is not None:
             cleaned = normalize_ocr_ja(text_layer)
             vocabulary = analyze_text(cleaned, max_words=max_vocab_words, db_path=db_path)
+            if target_lang != "en":
+                from translator import translate_vocabulary
+                translate_vocabulary(vocabulary, target_lang)
             return {"vocabulary": vocabulary}
         image_source = pdf_path_to_images(file_path, dpi=pdf_dpi)
     else:
@@ -127,4 +137,5 @@ def process_file(
         _get_engine(engine),
         max_vocab_words=max_vocab_words,
         db_path=db_path,
+        target_lang=target_lang,
     )

@@ -40,11 +40,13 @@ app.add_middleware(
 # ── API ───────────────────────────────────────────────────────────────────────
 
 ALLOWED_ENGINES = {"paddleocr", "yomitoku"}
+ALLOWED_LANGS   = {"en", "zh-CN", "lo", "th", "mn", "ko"}
 
 @app.post("/process")
 async def process_upload(
     file: UploadFile = File(...),
     engine: str = Form("paddleocr"),
+    target_lang: str = Form("en"),
 ):
     suffix = Path(file.filename).suffix.lower()
     if suffix not in ALLOWED_SUFFIXES:
@@ -53,11 +55,16 @@ async def process_upload(
     if engine not in ALLOWED_ENGINES:
         raise HTTPException(status_code=400, detail=f"Unknown engine: {engine}")
 
+    if target_lang not in ALLOWED_LANGS:
+        raise HTTPException(status_code=400, detail=f"Unsupported language: {target_lang}")
+
     data = await file.read()
 
     loop = asyncio.get_event_loop()
     try:
-        result = await loop.run_in_executor(None, process_bytes, data, suffix, engine)
+        result = await loop.run_in_executor(
+            None, lambda: process_bytes(data, suffix, engine=engine, target_lang=target_lang)
+        )
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 

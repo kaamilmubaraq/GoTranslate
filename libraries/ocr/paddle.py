@@ -13,8 +13,12 @@ from pathlib import Path
 
 import numpy as np
 
-# Models cached in $HOME/.cache/paddleocr — matches the Docker volume mount point.
-_MODEL_DIR = os.path.join(os.environ.get("HOME", "/root"), ".cache", "paddleocr")
+# PADDLE_OCR_DIR env var points to the pre-baked model directory in Docker
+# (/app/models/paddleocr). Falls back to the standard ~/.cache/paddleocr for
+# local development where models are auto-downloaded by PaddleOCR itself.
+_MODEL_DIR = os.environ.get("PADDLE_OCR_DIR") or os.path.join(
+    os.environ.get("HOME", "/root"), ".cache", "paddleocr"
+)
 
 
 class PaddleEngine:

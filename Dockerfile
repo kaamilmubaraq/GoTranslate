@@ -33,9 +33,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ── Pre-download all OCR models into the image (no internet needed at runtime) ─
-# Uses a build script so Docker's parser doesn't misread Python as Dockerfile instructions.
-# PaddleOCR: urllib+tarfile (no inference engine init → no /dev/shm segfault)
-# yomitoku:  huggingface_hub.snapshot_download (weights only, no model load)
+# Models land in /app/models/ (WORKDIR, world-readable) so they're accessible
+# whether the container runs as root or as a non-root user (e.g. HuggingFace Spaces uid 1000).
+ENV PADDLE_OCR_DIR=/app/models/paddleocr
+ENV HF_HOME=/app/models/huggingface
+
 COPY scripts/download_models.py /tmp/download_models.py
 RUN python3 /tmp/download_models.py && rm /tmp/download_models.py
 

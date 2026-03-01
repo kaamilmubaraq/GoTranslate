@@ -129,9 +129,10 @@ def run_pipeline(
     analyzer: Callable = analyze_text,
     max_vocab_words: Optional[int] = None,
     db_path: Optional[str] = None,
+    target_lang: str = "en",
 ) -> Dict:
     """
-    Run the full pipeline: OCR → clean → analyze vocab.
+    Run the full pipeline: OCR → clean → analyze vocab → translate.
 
     Parameters
     ----------
@@ -141,6 +142,7 @@ def run_pipeline(
     analyzer       : vocab extractor — default analyze_text
     max_vocab_words: optional cap on words passed to analyzer
     db_path        : optional path to a local jamdict.db
+    target_lang    : BCP-47 code for definition language ("en" = no translation)
 
     Returns
     -------
@@ -154,4 +156,9 @@ def run_pipeline(
     raw_text = "\n".join(raw_parts)
     cleaned = cleaner(raw_text)
     vocabulary = analyzer(cleaned, max_words=max_vocab_words, db_path=db_path)
+
+    if target_lang != "en":
+        from translator import translate_vocabulary
+        translate_vocabulary(vocabulary, target_lang)
+
     return {"vocabulary": vocabulary}
