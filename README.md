@@ -25,7 +25,7 @@ GoTranslateは、日本語文書の文字抽出と翻訳を行うオープンソ
 デジタルPDF、スキャンPDF、一般的な画像形式に対応し、原文と翻訳の比較、Word出力、
 語彙分析を利用できます。
 
-**Live app / アプリ:** [Hugging Face Spaces](https://huggingface.co/spaces/codekmh/GoTranslate)  
+**Live app / アプリ:** [Hugging Face Spaces](https://huggingface.co/spaces/codekmh/GoTranslate)<br>
 **Source code / ソースコード:** [GitHub](https://github.com/kaamilmubaraq/GoTranslate)
 
 ## Document workspace
