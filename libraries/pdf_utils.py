@@ -20,12 +20,12 @@ def extract_text_layer(data: bytes) -> Optional[str]:
     """
     Fast path: pull text directly from a PDF's embedded text layer.
 
-    Returns the combined text if the PDF contains real text on the majority
+    Returns the combined text if the PDF contains real text on all processed
     of pages, or None if the PDF appears to be a scanned image document
     (meaning OCR will be needed).
 
     A page is considered "text" if it yields at least 20 characters.
-    If more than half the pages fall below that threshold, returns None.
+    If any page falls below that threshold, returns None to avoid losing pages.
     """
     import fitz
 
@@ -42,7 +42,7 @@ def extract_text_layer(data: bytes) -> Optional[str]:
                 parts.append(text)
             else:
                 ocr_needed += 1
-        if ocr_needed > total / 2:
+        if ocr_needed:
             return None
         return "\n".join(parts) if parts else None
     finally:
@@ -74,7 +74,7 @@ def _fitz_doc_to_images(doc, dpi: int) -> Generator[np.ndarray, None, None]:
         for i, page in enumerate(doc):
             if i >= MAX_PDF_PAGES:
                 break
-            pix = page.get_pixmap(matrix=mat, alpha=False)
+            pix = page.get_pixmap(matrix=mat, alpha=False, colorspace=fitz.csRGB)
             arr = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
                 pix.height, pix.width, 3
             )

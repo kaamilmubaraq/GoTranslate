@@ -163,3 +163,8 @@ def test_images_from_bytes_invalid_suffix_raises():
 def test_images_from_bytes_invalid_image_data_raises():
     with pytest.raises((ValueError, Exception)):
         list(images_from_bytes(b"not an image", ".jpg"))
+
+def test_resize_extremely_narrow_image():
+    img = np.zeros((5000, 1, 3), dtype=np.uint8)
+    result = resize_if_large(img)
+    assert result.shape == (1100, 1, 3)

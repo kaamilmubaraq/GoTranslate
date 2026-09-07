@@ -174,3 +174,37 @@ def test_lookup_cached(monkeypatch):
     monkeypatch.setattr(jmd, "lookup", fake_lookup)
     lookup_english_meanings(jmd, "勉強")  # should hit cache
     assert called == [], "Cache miss — DB was called on second lookup"
+
+
+def test_reading_matches_dictionary_form():
+    from types import SimpleNamespace
+    word = SimpleNamespace(surface='食べた', feature=SimpleNamespace(kana='タベタ', kanaBase='タベル'))
+    assert extract_reading_hiragana(word) == 'たべる'
+
+
+def test_lookup_cache_isolated_by_dictionary():
+    from types import SimpleNamespace
+    from japanseanalyzer import lookup_entry_data
+    class Dictionary:
+        def __init__(self, text):
+            self.text = text
+        def lookup(self, query):
+            return SimpleNamespace(entries=[SimpleNamespace(senses=[SimpleNamespace(gloss=[self.text])], kanji_forms=[], kana_forms=[])])
+    assert lookup_entry_data(Dictionary('first'), 'same')[0] == ['first']
+    assert lookup_entry_data(Dictionary('second'), 'same')[0] == ['second']
+
+
+def test_transient_dictionary_failure_can_recover():
+    from types import SimpleNamespace
+    from japanseanalyzer import lookup_entry_data
+    class Dictionary:
+        calls = 0
+        def lookup(self, query):
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError('temporary')
+            return SimpleNamespace(entries=[])
+    dictionary = Dictionary()
+    lookup_entry_data(dictionary, 'word')
+    lookup_entry_data(dictionary, 'word')
+    assert dictionary.calls == 2

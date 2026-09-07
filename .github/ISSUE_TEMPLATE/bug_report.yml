@@ -1,0 +1,40 @@
+name: Bug report
+description: Report a reproducible problem in GoTranslate
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Please use synthetic or redacted documents. Never attach private data.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Commit SHA, release, or deployment URL
+    validations:
+      required: true
+  - type: dropdown
+    id: input
+    attributes:
+      label: Input type
+      options: [Digital PDF, Scanned PDF, Image, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true

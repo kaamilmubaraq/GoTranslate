@@ -22,8 +22,8 @@ def normalize_ocr_ja(text: str) -> str:
 
     # Single pass: drop control/format chars and stray combining marks
     text = "".join(
-        ch for ch in text
-        if unicodedata.category(ch)[0] != "C" and ch not in _COMBINING
+        " " if ch.isspace() else ch for ch in text
+        if (ch.isspace() or unicodedata.category(ch)[0] != "C") and ch not in _COMBINING
     )
 
     # Strip Latin glosses glued to Japanese characters

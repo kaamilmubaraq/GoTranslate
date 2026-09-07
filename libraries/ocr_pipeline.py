@@ -37,6 +37,8 @@ _yomitoku = YomitokuEngine()
 
 
 def _get_engine(name: str):
+    if name not in {"yomitoku", "paddleocr"}:
+        raise ValueError(f"Unknown OCR engine: {name}")
     return _yomitoku if name == "yomitoku" else _paddle
 
 

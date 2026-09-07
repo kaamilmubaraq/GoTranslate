@@ -51,12 +51,14 @@ def resize_if_large(img: np.ndarray, max_side: int = MAX_OCR_SIDE) -> np.ndarray
     Downscale image so its longest side is at most max_side pixels.
     Uses INTER_AREA (best quality for shrinking). No-op if already small enough.
     """
+    if max_side < 1 or img.ndim < 2 or not all(img.shape[:2]):
+        raise ValueError("Image dimensions and max_side must be positive")
     h, w = img.shape[:2]
     if max(h, w) <= max_side:
         return img
     scale = max_side / max(h, w)
     return cv2.resize(
-        img, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA
+        img, (max(1, int(w * scale)), max(1, int(h * scale))), interpolation=cv2.INTER_AREA
     )
 
 
@@ -81,6 +83,8 @@ def images_from_bytes(
     if suffix == ".pdf":
         yield from pdf_bytes_to_images(data, dpi=pdf_dpi)
     elif suffix in SUPPORTED_IMAGE_EXTS:
+        if not data:
+            raise ValueError("The uploaded image is empty")
         arr = np.frombuffer(data, dtype=np.uint8)
         img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if img is None:
@@ -161,4 +165,4 @@ def run_pipeline(
         from translator import translate_vocabulary
         translate_vocabulary(vocabulary, target_lang)
 
-    return {"vocabulary": vocabulary}
+    return {"vocabulary": vocabulary, "source_text": raw_text}

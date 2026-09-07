@@ -16,3 +16,6 @@ jaconv==0.5.0
 jamdict
 jamdict-data==1.5
 deep-translator==1.11.4
+# Direct translation client dependencies (bounded HTTP requests)
+requests>=2.32.4,<3
+beautifulsoup4>=4.12,<5

@@ -63,7 +63,8 @@ _WS_RE = re.compile(r"\s+")             # compiled once at import time
 
 _TAGGER: Optional[fugashi.Tagger] = None
 _JMD: Optional[Jamdict] = None
-_ENTRY_CACHE: Dict[str, Tuple[List[str], int]] = {}  # lemma:max_senses → (meanings, freq_score)
+_JMD_PATH: Optional[str] = None
+_ENTRY_CACHE: Dict[tuple, Tuple[List[str], int]] = {}
 
 
 # =========================
@@ -112,8 +113,8 @@ def normalize_ocr_text(text: str) -> str:
 
     # Single pass: drop control/format chars and stray combining marks
     text = "".join(
-        ch for ch in text
-        if unicodedata.category(ch)[0] != "C" and ch not in _COMBINING_MARKS
+        " " if ch.isspace() else ch for ch in text
+        if (ch.isspace() or unicodedata.category(ch)[0] != "C") and ch not in _COMBINING_MARKS
     )
 
     # Normalize whitespace
@@ -152,22 +153,25 @@ def get_jamdict(db_path: Optional[str] = None, db_filename: str = "jamdict.db") 
 
     If no local DB is found, it falls back to Jamdict() default behavior.
     """
-    global _JMD
-    if _JMD is not None:
-        return _JMD
+    global _JMD, _JMD_PATH
 
     # Resolve db path
     chosen_path = (db_path or "").strip()
     if not chosen_path:
         chosen_path = resolve_jamdict_db_path(db_filename=db_filename)
+    if chosen_path:
+        chosen_path = os.path.abspath(chosen_path)
+        if not os.path.isfile(chosen_path):
+            raise ValueError(f"Dictionary database not found: {chosen_path}")
+    if _JMD is not None and _JMD_PATH == chosen_path:
+        return _JMD
 
     if chosen_path and os.path.exists(chosen_path):
         _JMD = Jamdict(db_file=chosen_path)
     else:
-        if chosen_path:
-            print(f"⚠️ Warning: jamdict.db not found at: {chosen_path} (falling back to default)")
         _JMD = Jamdict()
 
+    _JMD_PATH = chosen_path
     return _JMD
 
 
@@ -226,7 +230,7 @@ def extract_reading_hiragana(word: fugashi.fugashi.Node) -> str:
     Get reading in hiragana.
     fugashi/unidic typically provides kana in katakana; convert to hiragana.
     """
-    raw = getattr(word.feature, "kana", "") or ""
+    raw = getattr(word.feature, "kanaBase", "") or getattr(word.feature, "kana", "") or ""
     if raw and raw != "*":
         try:
             return jaconv.kata2hira(raw)
@@ -335,7 +339,7 @@ def lookup_entry_data(jmd: Jamdict, query: str, max_senses: int = 2) -> Tuple[Li
 
     Returns (meanings, freq_score) where higher freq_score = harder/rarer word.
     """
-    cache_key = f"{query}\x00{max_senses}"
+    cache_key = (jmd, query, max_senses)
     if cache_key in _ENTRY_CACHE:
         return _ENTRY_CACHE[cache_key]
 
@@ -352,10 +356,17 @@ def lookup_entry_data(jmd: Jamdict, query: str, max_senses: int = 2) -> Tuple[Li
                     meanings.append(definition)
             freq_score = _entry_freq_score(entry)
     except Exception:
-        pass
+        return [], 999  # Transient failures must not poison the cache.
 
+    if len(_ENTRY_CACHE) >= 4096:
+        _ENTRY_CACHE.pop(next(iter(_ENTRY_CACHE)))
     _ENTRY_CACHE[cache_key] = (meanings, freq_score)
     return meanings, freq_score
+
+
+def lookup_english_meanings(jmd: Jamdict, query: str, max_senses: int = 2) -> List[str]:
+    """Backward-compatible dictionary lookup API."""
+    return list(lookup_entry_data(jmd, query, max_senses)[0])
 
 
 # =========================
@@ -436,7 +447,7 @@ def analyze_text(
             })
 
     except Exception as e:
-        print(f"Error analyzing text: {e}")
+        raise RuntimeError("Japanese vocabulary analysis failed") from e
 
     # Sort: words with definitions first (hardest→easiest), then no-definition words at the end
     results.sort(

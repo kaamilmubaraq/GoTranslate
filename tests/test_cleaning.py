@@ -67,3 +67,6 @@ def test_regular_japanese_unchanged():
     result = normalize_ocr_ja(text)
     assert "定積分" in result
     assert "求め" in result
+
+def test_newlines_and_tabs_preserve_word_boundaries():
+    assert normalize_ocr_ja('日本\n語\t学校') == '日本 語 学校'

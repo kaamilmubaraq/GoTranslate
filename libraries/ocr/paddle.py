@@ -56,7 +56,7 @@ class PaddleEngine:
         result = self._ocr.ocr(img, cls=True)
         if not result or result[0] is None:
             return ""
-        return "".join(line[1][0] for line in result[0] if line and line[1])
+        return "\n".join(line[1][0] for line in result[0] if line and line[1])
 
 
 # ---------------------------------------------------------------------------

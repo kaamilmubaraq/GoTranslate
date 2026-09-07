@@ -11,3 +11,13 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+
+# local tools and scratch files
+.claude/settings.local.json
+notes.txt
+
+# frontend environment overrides and build artifacts
+frontend/.env*
+!frontend/.env.example
+frontend/node_modules/
+frontend/build/
