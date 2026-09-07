@@ -28,6 +28,30 @@ GoTranslateは、日本語文書の文字抽出と翻訳を行うオープンソ
 **Live app / アプリ:** [Hugging Face Spaces](https://huggingface.co/spaces/codekmh/GoTranslate)<br>
 **Source code / ソースコード:** [GitHub](https://github.com/kaamilmubaraq/GoTranslate)
 
+## Product tour / 製品ツアー
+
+| Empty workspace / 空のワークスペース | Document ready / 文書の準備完了 |
+| --- | --- |
+| ![GoTranslate empty workspace](docs/screenshots/empty-state.png) | ![A one-page Japanese academic PDF uploaded to GoTranslate](docs/screenshots/uploaded-file.png) |
+
+| Side-by-side result / 原文・翻訳結果 | Vocabulary analysis / 語彙分析 |
+| --- | --- |
+| ![GoTranslate side-by-side document result](docs/screenshots/translation-results.png) | ![Japanese vocabulary with readings, definitions, and JLPT levels](docs/screenshots/vocabulary-view.png) |
+
+| Search and filter / 検索・絞り込み | Mobile workspace / モバイル表示 |
+| --- | --- |
+| ![Vocabulary filtered by an English definition](docs/screenshots/search-filter-results.png) | ![GoTranslate responsive mobile workspace](docs/screenshots/mobile-view.png) |
+
+The screenshots use a one-page Japanese phonetics conference abstract published
+through J-STAGE. Vocabulary extraction produced 281 terms with readings and English
+definitions. The translation image also demonstrates the reviewable fallback shown
+when the external machine-translation service is unavailable.
+
+スクリーンショットには、J-STAGEで公開されている日本語音声学の1ページの
+学会発表要旨を使用しています。語彙抽出では、読み方と英語定義を含む281語を
+取得しました。翻訳画像では、外部の機械翻訳サービスを利用できない場合に表示される
+確認可能なフォールバックも示しています。
+
 ## Document workspace
 
 GoTranslate extracts Japanese text from PDFs and images and provides full-document
