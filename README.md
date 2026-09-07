@@ -3,9 +3,15 @@ title: GoTranslate
 emoji: 🈳
 sdk: docker
 app_port: 7860
+short_description: Japanese document OCR and translation / 日本語文書のOCR・翻訳ツール
+tags:
+  - japanese
+  - ocr
+  - translation
+  - pdf
 ---
 
-GoTranslate - Japanese OCR and Translation Tool
+# GoTranslate
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-b6382d.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)](https://www.python.org/)
@@ -14,6 +20,13 @@ GoTranslate - Japanese OCR and Translation Tool
 GoTranslate is an open-source workspace for extracting and translating Japanese
 documents. It supports digital and scanned PDFs, common image formats,
 side-by-side review, Word export, and vocabulary analysis.
+
+GoTranslateは、日本語文書の文字抽出と翻訳を行うオープンソースのワークスペースです。
+デジタルPDF、スキャンPDF、一般的な画像形式に対応し、原文と翻訳の比較、Word出力、
+語彙分析を利用できます。
+
+**Live app / アプリ:** [Hugging Face Spaces](https://huggingface.co/spaces/codekmh/GoTranslate)  
+**Source code / ソースコード:** [GitHub](https://github.com/kaamilmubaraq/GoTranslate)
 
 ## Document workspace
 
